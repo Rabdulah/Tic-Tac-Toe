@@ -1,26 +1,54 @@
 <template>
-<div>
-  <table class="center" id="tic-tac-toe">
-    <tr>
-      <td class="cell" id="0"></td>
-      <td class="cell" id="1"></td>
-      <td class="cell" id="2"></td>
-    </tr>
-    <tr>
-      <td class="cell" id="3"></td>
-      <td class="cell" id="4"></td>
-      <td class="cell" id="5"></td>
-    </tr>
-    <tr>
-      <td class="cell" id="6"></td>
-      <td class="cell" id="7"></td>
-      <td class="cell" id="8"></td>
-    </tr>
-  </table>
-  <div>
-    <button v-on:click="restart">New Game</button>
-    <button v-on:click="tw"
+<div class="container-fluid text-center">
+  <h1>TIC-TAC-TOE</h1>
+  <div class="container">
+  <div class="row">
+    <div class="col modeBtn">
+      <button v-on:click="onePlayer" class="button1 float-right"></button>
+    </div>
+    <div class="col" id="table">
+    <table class="center" id="tic-tac-toe">
+      <tr>
+        <td class="cell" id="0"></td>
+        <td class="cell" id="1"></td>
+        <td class="cell" id="2"></td>
+      </tr>
+      <tr>
+        <td class="cell" id="3"></td>
+        <td class="cell" id="4"></td>
+        <td class="cell" id="5"></td>
+      </tr>
+      <tr>
+        <td class="cell" id="6"></td>
+        <td class="cell" id="7"></td>
+        <td class="cell" id="8"></td>
+      </tr>
+    </table>
+    </div>
+    <div class="col modeBtn">
+      <button v-on:click="twoPlayer" type="button" class="button2 float-left"></button>
+    </div>
   </div>
+    <div class="row">
+      <div class="col text-center">
+        <div class="dropdown" >
+          <button class="btn btn-lg btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            AI Difficulty
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" v-on:click="easy">Easy</a>
+            <a class="dropdown-item" v-on:click="medium">Tough</a>
+            <a class="dropdown-item" v-on:click="impossible">Impossible</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div class="row">
+    <div class="col text-center align-self-end">
+    <button id="restart" type="button" class="btn btn-secondary btn-lg" v-on:click="restart">New Game</button>
+    </div>
+  </div>
+</div>
 </div>
 </template>
 
@@ -36,6 +64,9 @@ export default {
       player2: 'O', // null,
       ai: "O",
       cells: null,
+      gameMode: null,
+      semaphore: 0,
+      difficulty: 500, // null,
       winConditions: [
         [0, 1, 2],
         [3, 4, 5],
@@ -52,6 +83,54 @@ export default {
       this.restart()
   },
   methods: {
+    easy () {
+      this.difficulty = 500
+    },
+    medium () {
+      this.difficulty = 800
+    },
+    impossible () {
+      this.difficulty = 1000
+    },
+    onePlayer () {
+      this.restart()
+      this.gameMode = "one"
+      //document.getElementById("drop").style.visibility=true
+    },
+    twoPlayer () {
+      this.restart()
+      this.gameMode = "two"
+      //document.getElementById('drop').style.visibility=false
+    },
+    vsPC (cell) {
+
+        this.turn(cell.target.id, this.player1)
+        if (!this.isTie() && this.isWin != true) {
+          if (this.handiCap() < this.difficulty) {
+            this.turn(this.bestSpot(), this.ai)
+          } else {
+            this.turn(this.randomPick(), this.ai)
+          }
+        }
+
+    },
+    vsHuman (cell) {
+      if (this.semaphore == 0) {
+        this.turn(cell.target.id, this.player1)
+        this.semaphore = 1;
+      } else if (this.semaphore == 1){
+        this.turn(cell.target.id, this.player2)
+        this.semaphore = 0;
+      }
+    },
+    randomPick () {
+      var available =  this.freeCells()
+      var rand = available[(Math.floor(Math.random() * (this.freeCells().length)))]
+      return rand
+    },
+    handiCap () {
+      return Math.floor(Math.random() * 999)
+    },
     restart: function () {
       this.isWin = null
       this.gameBoard = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -59,22 +138,23 @@ export default {
       for (var i = 0; i < this.cells.length; i++) {
          this.cells[i].innerText = ''
          this.cells[i].addEventListener('click', this.click, false)
-         this.cells[i].style.backgroundColor = "white"
+         this.cells[i].style.backgroundColor = 'transparent'
       }
     },
     click: function (cell) {
-      if (typeof this.gameBoard[cell.target.id] == 'number') {
-        this.turn(cell.target.id, this.player1)
-        if (!this.isTie() && this.isWin != true) {
-          this.turn(this.bestSpot(), this.ai)
-          //console.log('bestspot', this.bestSpot())
-        }
+    if (typeof this.gameBoard[cell.target.id] == 'number') {
+      if (this.gameMode != "two") {
+        this.vsPC(cell)
+      } else {
+        this.vsHuman(cell)
       }
-    },
+    }
+  },
     turn: function (cellId, player) {
       this.gameBoard[cellId] = player
       document.getElementById(cellId).innerText = player
       if (this.checkWin(this.gameBoard, player)) {
+        debugger
         this.gameOver(this.isWin)
       }
     },
@@ -84,7 +164,6 @@ export default {
       this.isWin = null
       for (let [i, winCon] of this.winConditions.entries()) {
         if (winCon.every(con => filled.indexOf(con) > -1)) {
-          console.log(filled)
           this.isWin = {index: i, player: player}
           break
         }
@@ -93,7 +172,7 @@ export default {
     },
     gameOver(isWin) {
       for (let i of this.winConditions[isWin.index]) {
-        document.getElementById(i).style.backgroundColor = isWin.player == this.player1 ? "blue" : "red"
+        document.getElementById(i).style.backgroundColor = isWin.player == this.player1 ? "#00B6EF" : "#FF771A"
       }
       for (var i = 0; i < this.cells.length; i++) {
         this.cells[i].removeEventListener('click', this.click, false)
@@ -101,11 +180,11 @@ export default {
       this.isWin = true
     },
     bestSpot() {
-      var best = this.miniMax(this.gameBoard, this.ai).index
-      return best
+      return this.miniMax(this.gameBoard, this.ai).index
+      //return best
     },
     miniMax(board, player) {
-      let free = this.freeCells(board)
+      let free = this.freeCells()
       //console.log('free cells in minimax', free, 'free length', free.length)
       if (this.checkWin(board, this.player1)) {
         return {score: -10};
@@ -163,11 +242,13 @@ export default {
     },
     isTie() {
       if (this.freeCells().length == 0) {
-        for (var i = 0; i < this.cells.length; i++) {
-          this.cells[i].style.backgroundColor = "green"
-          this.cells[i].removeEventListener('click', this.click, false)
+        if (this.isWin != true) {
+          for (var i = 0; i < this.cells.length; i++) {
+            this.cells[i].style.backgroundColor = "green"
+            this.cells[i].removeEventListener('click', this.click, false)
+          }
+          return true
         }
-        return true
       }
       return false
     }
@@ -181,6 +262,11 @@ export default {
     height: 150px;
     width: 150px;
     cursor: pointer;
+    //background-color: transparent !important;
+    text-align:  center;
+    vertical-align:  middle;
+    font-family:  "Comic Sans MS", cursive, sans-serif;
+    font-size:  70px;
   }
 
   table {
@@ -188,7 +274,6 @@ export default {
     margin-left:auto;
     margin-right:auto;
   }
-
   table tr:first-child td {
     border-top: 0;
   }
@@ -201,4 +286,47 @@ export default {
   table tr td:last-child {
     border-right: 0;
   }
+  .button1 {
+    background:url(../assets/onePlayerAI.png) no-repeat;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    background-size: 100%;
+  }
+  .button2 {
+    background:url(../assets/twoplayer.png);
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    background-size: 100%;
+    align: right;
+  }
+
+  .container-fluid {
+    background-color: transparent;
+    position:relative;
+
+  }
+  .modeBtn {
+    padding-top: 160px;
+  }
+  #table {
+    padding-top: 0px;
+  }
+  .cell {
+  }
+  h1 {
+    color: #1F1E1E;
+  }
+  #restart {
+    margin-top: 10px;
+  }
+  body {
+    background: linear-gradient(288deg, #DF9F0E, #138DC7);
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+  }
+  .dropdown {
+  }
+
 </style>
