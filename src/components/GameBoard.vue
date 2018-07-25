@@ -1,12 +1,8 @@
 <template>
 <div class="container-fluid text-center">
   <h1>TIC-TAC-TOE</h1>
-  <div class="container">
-  <div class="row">
-    <div class="col modeBtn">
-      <button v-on:click="onePlayer" class="button1 float-right"></button>
-    </div>
-    <div class="col" id="table">
+  <div class="container text-center">
+    <div id="table">
     <table class="center" id="tic-tac-toe">
       <tr>
         <td class="cell" id="0"></td>
@@ -25,12 +21,13 @@
       </tr>
     </table>
     </div>
-    <div class="col modeBtn">
+    <div class="zoom modeBtn">
+      <button v-on:click="onePlayer" class="button1 float-right"></button>
+    </div>
+    <div class="zoom modeBtn">
       <button v-on:click="twoPlayer" type="button" class="button2 float-left"></button>
     </div>
-  </div>
-    <div class="row">
-      <div class="col text-center">
+      <div class=" text-center">
         <div class="dropdown" >
           <button class="btn btn-lg btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             AI Difficulty
@@ -40,15 +37,13 @@
             <a class="dropdown-item" v-on:click="medium">Tough</a>
             <a class="dropdown-item" v-on:click="impossible">Impossible</a>
           </div>
-        </div>
       </div>
     </div>
-  <div class="row">
-    <div class="col text-center align-self-end">
+    <div class=" text-center align-self-end">
     <button id="restart" type="button" class="btn btn-secondary btn-lg" v-on:click="restart">New Game</button>
     </div>
   </div>
-</div>
+
 </div>
 </template>
 
@@ -154,7 +149,6 @@ export default {
       this.gameBoard[cellId] = player
       document.getElementById(cellId).innerText = player
       if (this.checkWin(this.gameBoard, player)) {
-        debugger
         this.gameOver(this.isWin)
       }
     },
@@ -259,7 +253,7 @@ export default {
 <style>
   td {
     border: 2px solid;
-    height: 150px;
+    height: 120px;
     width: 150px;
     cursor: pointer;
     //background-color: transparent !important;
@@ -308,7 +302,7 @@ export default {
 
   }
   .modeBtn {
-    padding-top: 160px;
+    //padding-top: 160px;
   }
   #table {
     padding-top: 0px;
@@ -321,12 +315,19 @@ export default {
   #restart {
     margin-top: 10px;
   }
-  body {
-    background: linear-gradient(288deg, #DF9F0E, #138DC7);
+  html, body {
+    background: linear-gradient(288deg, #DF9F0E, #138DC7) no-repeat;
+    background-size: cover;
     margin-bottom: 0px;
     padding-bottom: 0px;
+    min-height: 100%;
   }
-  .dropdown {
+  .zoom {
+    transition: transform .2s; /* Animation */
+  }
+
+  .zoom:hover {
+    transform: scale(1.05); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
   }
 
 </style>
