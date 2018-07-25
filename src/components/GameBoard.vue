@@ -19,6 +19,7 @@
   </table>
   <div>
     <button v-on:click="restart">New Game</button>
+    <button v-on:click="tw"
   </div>
 </div>
 </template>
@@ -30,11 +31,21 @@ export default {
   data () {
     return {
       gameBoard: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-      isWin: false,
-      player1: null,
-      player2: null,
-      ai: null,
-      cells: null
+      isWin: 'null',
+      player1: 'X', // null,
+      player2: 'O', // null,
+      ai: "O",
+      cells: null,
+      winConditions: [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+      ]
     }
   },
   mounted: function () {
@@ -42,15 +53,123 @@ export default {
   },
   methods: {
     restart: function () {
+      this.isWin = null
       this.gameBoard = [0, 1, 2, 3, 4, 5, 6, 7, 8]
       this.cells = document.querySelectorAll('.cell')
       for (var i = 0; i < this.cells.length; i++) {
          this.cells[i].innerText = ''
          this.cells[i].addEventListener('click', this.click, false)
+         this.cells[i].style.backgroundColor = "white"
       }
     },
     click: function (cell) {
-      console.log(cell.target.id)
+      if (typeof this.gameBoard[cell.target.id] == 'number') {
+        this.turn(cell.target.id, this.player1)
+        if (!this.isTie() && this.isWin != true) {
+          this.turn(this.bestSpot(), this.ai)
+          //console.log('bestspot', this.bestSpot())
+        }
+      }
+    },
+    turn: function (cellId, player) {
+      this.gameBoard[cellId] = player
+      document.getElementById(cellId).innerText = player
+      if (this.checkWin(this.gameBoard, player)) {
+        this.gameOver(this.isWin)
+      }
+    },
+    checkWin(gameBoard, player) {
+      var filled = gameBoard.reduce((a, e, i) =>
+        (e === player) ? a.concat(i) : a, [])
+      this.isWin = null
+      for (let [i, winCon] of this.winConditions.entries()) {
+        if (winCon.every(con => filled.indexOf(con) > -1)) {
+          console.log(filled)
+          this.isWin = {index: i, player: player}
+          break
+        }
+      }
+      return this.isWin
+    },
+    gameOver(isWin) {
+      for (let i of this.winConditions[isWin.index]) {
+        document.getElementById(i).style.backgroundColor = isWin.player == this.player1 ? "blue" : "red"
+      }
+      for (var i = 0; i < this.cells.length; i++) {
+        this.cells[i].removeEventListener('click', this.click, false)
+      }
+      this.isWin = true
+    },
+    bestSpot() {
+      var best = this.miniMax(this.gameBoard, this.ai).index
+      return best
+    },
+    miniMax(board, player) {
+      let free = this.freeCells(board)
+      //console.log('free cells in minimax', free, 'free length', free.length)
+      if (this.checkWin(board, this.player1)) {
+        return {score: -10};
+      } else if (this.checkWin(board, this.ai)) {
+        return {score: 10}
+      } else if (free.length == 0) {
+        return {score: 0}
+      }
+      var moves = [] // possible moves available to this player instance
+      for (var i = 0; i < free.length; i++) {
+        var move = {}
+        move.index = board[free[i]]
+        board[free[i]] = player
+        if (player == this.ai) {
+          var result = this.miniMax(board, this.player1);
+          move.score = result.score;
+        } else {
+          var result = this.miniMax(board, this.ai)
+          move.score = result.score;
+        }
+        board[free[i]] = move.index
+        moves.push(move)
+        //console.log("moves", moves, "length", moves.length)
+      }
+      var bestMove;
+      if(player == this.ai) {
+        var bestScore = -1000;
+        for(var i = 0; i < moves.length; i++) {
+          //debugger
+          if (moves[i].score > bestScore) {
+            bestScore = moves[i].score
+            bestMove = i
+          }
+        }
+      } else {
+        var bestScore = 1000;
+        for(var i = 0; i < moves.length; i++) {
+          if (moves[i].score < bestScore) {
+            bestScore = moves[i].score
+            bestMove = i
+          }
+        }
+      }
+
+      return moves[bestMove];
+    },
+    freeCells() {
+      let free = []
+      for (var i = 0; i < this.gameBoard.length; i++) {
+        if (typeof this.gameBoard[i] == "number") {
+          free.push(this.gameBoard[i])
+        }
+      }
+      return free
+    },
+    isTie() {
+      if (this.freeCells().length == 0) {
+        for (var i = 0; i < this.cells.length; i++) {
+          this.cells[i].style.backgroundColor = "green"
+          this.cells[i].removeEventListener('click', this.click, false)
+        }
+        return true
+      }
+      return false
     }
   }
 }
