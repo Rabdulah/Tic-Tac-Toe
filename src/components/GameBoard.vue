@@ -238,7 +238,7 @@ export default {
       if (this.freeCells().length == 0) {
         if (this.isWin != true) {
           for (var i = 0; i < this.cells.length; i++) {
-            this.cells[i].style.backgroundColor = "green"
+            this.cells[i].style.backgroundColor = "#969840"
             this.cells[i].removeEventListener('click', this.click, false)
           }
           return true
