@@ -288,7 +288,7 @@ export default {
     background-size: 100%;
   }
   .button2 {
-    background:url('https://raw.githubusercontent.com/Rabdulah/Tic-Tac-Toe/master/docs/static/img/twoplayer.59fadaa.png');
+    background:url(../assets/twoplayer.png);
     border-radius: 50%;
     width: 150px;
     height: 150px;
