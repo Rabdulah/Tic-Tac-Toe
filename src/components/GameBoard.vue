@@ -316,7 +316,7 @@ export default {
     margin-top: 10px;
   }
   html, body {
-    background: linear-gradient(288deg, #DF9F0E, #138DC7) no-repeat;
+    background: linear-gradient(288deg, #DF9F0E, #138DC7) no-repeat center center fixed;
     background-size: cover;
     margin-bottom: 0px;
     padding-bottom: 0px;
