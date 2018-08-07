@@ -288,7 +288,7 @@ export default {
     background-size: 100%;
   }
   .button2 {
-    background:url(../assets/twoplayer.png);
+    background:url(http://gdurl.com/1vfU);
     border-radius: 50%;
     width: 150px;
     height: 150px;
