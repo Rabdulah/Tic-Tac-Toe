@@ -256,7 +256,6 @@ export default {
     height: 120px;
     width: 150px;
     cursor: pointer;
-    //background-color: transparent !important;
     text-align:  center;
     vertical-align:  middle;
     font-family:  "Comic Sans MS", cursive, sans-serif;
@@ -288,7 +287,7 @@ export default {
     background-size: 100%;
   }
   .button2 {
-    background:url('http://gdurl.com/1vfU');
+    background:url(../assets/twoPlayer.png);
     border-radius: 50%;
     width: 150px;
     height: 150px;
@@ -301,9 +300,9 @@ export default {
     position:relative;
 
   }
-  .modeBtn {
-    //padding-top: 160px;
-  }
+  /* .modeBtn {
+    padding-top: 160px;
+  } */
   #table {
     padding-top: 0px;
   }
