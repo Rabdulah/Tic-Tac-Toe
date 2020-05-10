@@ -73,6 +73,7 @@ export default {
       ai: "O",
       cells: null,
       gameMode: null,
+      color: false,
       semaphore: 0,
       difficulty: 500,
       winConditions: [
@@ -155,8 +156,13 @@ export default {
       }
     },
     turn: function(cellId, player) {
+      this.color = !this.color;
       this.gameBoard[cellId] = player;
       document.getElementById(cellId).innerText = player;
+      document.getElementById(cellId).style.color = this.color
+        ? "#545454"
+        : "#f2ebd3";
+
       if (this.checkWin(this.gameBoard, player)) {
         this.gameOver(this.isWin);
       }
@@ -360,14 +366,14 @@ table tr td:last-child {
 }
 .cell {
 }
-/* .vert {
-  border-left: 10px solid;
-  border-right: 10px solid;
+.vert {
+  border-left: 10px solid #0da192 !important;
+  border-right: 10px solid #0da192 !important;
 }
 .hori {
-  border-top: 10px solid !important;
-  border-bottom: 10px solid;
-} */
+  border-top: 10px solid #0da192 !important;
+  border-bottom: 10px solid #0da192 !important;
+}
 h1 {
   color: #1f1e1e;
 }
