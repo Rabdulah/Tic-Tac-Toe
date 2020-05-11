@@ -353,7 +353,7 @@ table tr td:last-child {
 }
 @media screen and (min-width: 768px) {
   h1 {
-    font-size: 4.5rem;
+    font-size: 4.5rem !important;
   }
 }
 
@@ -382,7 +382,7 @@ h1 {
 }
 html,
 body {
-  background: #14bdac;
+  background: #14bdac !important;
   background-size: cover;
   margin-bottom: 0px;
   padding-bottom: 0px;

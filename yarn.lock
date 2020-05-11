@@ -6393,7 +6393,7 @@ vue-eslint-parser@^2.0.3:
     esquery "^1.0.0"
     lodash "^4.17.4"
 
-vue-gh-pages@^1.16.3:
+vue-gh-pages@^1.19.0:
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/vue-gh-pages/-/vue-gh-pages-1.19.0.tgz#8239b875ef73810aeb5b1d38e94a60de3131bb92"
   dependencies:
